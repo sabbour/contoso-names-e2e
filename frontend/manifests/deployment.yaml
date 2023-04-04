@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: contoso-names-frontend
+  namespace: contoso-names-app
   labels:
     app: contoso-names-frontend
 spec:
@@ -13,10 +14,15 @@ spec:
     metadata:
       labels:
         app: contoso-names-frontend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "80"
     spec:
       containers:
       - name: contoso-names-frontend
-        image: ghcr.io/sabbour/contoso-names-frontend:latest
+        image: cr2fj2ijfoty7ic.azurecr.io/contoso-names-frontend:cb1
         imagePullPolicy: Always
         ports:
         - containerPort: 3000

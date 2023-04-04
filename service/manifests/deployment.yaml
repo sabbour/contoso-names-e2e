@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contoso-names-service
+  namespace: contoso-names-app
+  labels:
+    app: contoso-names-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: contoso-names-service
+  template:
+    metadata:
+      labels:
+        app: contoso-names-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "80"
+    spec:
+      containers:
+      - name: contoso-names-service
+        image: cr2fj2ijfoty7ic.azurecr.io/contoso-names-service:cb8
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: REDIS_PRIMARY_KEY
+          valueFrom:
+              secretKeyRef:
+                name: redis-secret  # This is the secret created by ASO associated with the Redis Cache.
+                key: primaryKey
+                optional: false
+        - name: REDIS_HOSTNAME
+          valueFrom:
+              secretKeyRef:
+                name: redis-secret  # This is the secret created by ASO associated with the Redis Cache.
+                key: hostName
+                optional: false
+        - name: REDIS_PORT
+          valueFrom:
+              secretKeyRef:
+                name: redis-secret  # This is the secret created by ASO associated with the Redis Cache.
+                key: port
+                optional: false

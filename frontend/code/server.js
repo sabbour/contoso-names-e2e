@@ -1,5 +1,7 @@
 const next = require('next');
-const express = require('express')
+const express = require('express');
+const prometheus = require('prom-client');
+const promBundle = require("express-prom-bundle");
 const bodyParser = require("body-parser");
 const http = require('http');
 
@@ -7,9 +9,32 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
+// Add the options to the prometheus middleware most option are for http_request_duration_seconds histogram metric
+const metricsMiddleware = promBundle({
+    includeMethod: true, 
+    includePath: true, 
+    includeStatusCode: true, 
+    includeUp: true,
+    customLabels: {project_name: 'contoso-frontend', project_type: 'frontend'},
+    promClient: {
+        collectDefaultMetrics: {
+        }
+      }
+});
+
+
 app.prepare().then(() => {
     const server = express();
     server.use(bodyParser.json());
+    
+    // add the prometheus middleware to all routes
+    server.use(metricsMiddleware);
+
+    // Prometheus metrics scraping endpoint
+    server.get('/metrics', async (req, res) => {
+        res.setHeader('Content-Type', register.contentType);
+        res.send(await register.metrics());
+    });
 
     server.get("/api/names", function (req, res) {
         console.log("server.get /api/names")
@@ -48,6 +73,9 @@ app.prepare().then(() => {
     });
 });
 
+// Function to request data from backend API
+// Checks for the existence of the kubernetes-route-as header and forwards it to the backend API if it exists
+// This header is used by the Bridge to Kubernetes routing manager to perform traffic isolation when debugging
 function requestData(initialRequest, host, port, path, method, bodyObject, responseHandler) {
     console.log("%s - %s:%s%s", method, host, port, path);
     var options = {

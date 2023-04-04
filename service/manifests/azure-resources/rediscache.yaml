@@ -1,0 +1,41 @@
+apiVersion: resources.azure.com/v1beta20200601
+kind: ResourceGroup
+metadata:
+  name: contoso-names-rg
+  namespace: contoso-names-app
+spec:
+  location: westus3
+---
+apiVersion: cache.azure.com/v1beta20201201
+kind: Redis
+metadata:
+  name: contoso-service-rediscache
+  namespace: contoso-names-app
+spec:
+  location: westus3
+  owner: 
+    name: contoso-names-rg
+  sku:
+    family: C
+    name: Basic
+    capacity: 0
+  enableNonSslPort: false
+  minimumTlsVersion: "1.2"
+  redisConfiguration:
+    maxmemory-delta: "10"
+    maxmemory-policy: allkeys-lru
+  redisVersion: "6"
+  operatorSpec:
+    secrets:
+      primaryKey:
+        name: redis-secret
+        key: primaryKey
+      secondaryKey:
+        name: redis-secret
+        key: secondaryKey
+      hostName:
+        name: redis-secret
+        key: hostName
+      sslPort:
+        name: redis-secret
+        key: port
