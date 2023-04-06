@@ -4,7 +4,8 @@ metadata:
   name: azure-prometheus-auth
 spec:
   podIdentity:
-    provider: azure
+    provider: azure-workload
+    identityId: ${KEDA_WORKLOADIDENTITY_ID}
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -20,7 +21,7 @@ spec:
   triggers:
     - type: prometheus
       metadata:
-        serverAddress:  ${PROMETHEUS_ENDPOINT}
+        serverAddress: ${PROMETHEUS_ENDPOINT}
         metricName: http_requests_received_total
         threshold: '15'
         query: sum(rate(http_requests_received_total{ app="contoso-names-service", code="200", endpoint="/names"}[1m]))

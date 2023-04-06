@@ -111,8 +111,30 @@ module assignAzureMonitorDataReaderRoleToKEDA 'role-assignments/azuremonitor-rol
   name: 'assignAzureMonitorDataReaderRoleToKEDA'
   scope: resourceGroup
   params: {
-    principalId: kedaManagedIdentity.outputs.managedIdentityClientId
+    principalId: kedaManagedIdentity.outputs.managedIdentityPrincipalId
     azureMonitorName: monitoring.outputs.azureMonitorWorkspaceName
+  }
+}
+
+// Managed identity for Azure Service Operator
+module asoManagedIdentity 'managed-identity/aso-workload-identity.bicep' = {
+  name: 'aso-managed-identity'
+  scope: resourceGroup
+  params: {
+    managedIdentityName:  '${abbrs.managedIdentityUserAssignedIdentities}${resourceToken}-aso'
+    federatedIdentityName:  '${abbrs.federatedIdentityCredentials}${resourceToken}-aso'
+    aksOidcIssuer: aks.outputs.aksOidcIssuer
+    location: location
+    tags: tags
+  }
+}
+
+// Assign subscription Contributor role to the ASO managed identity
+// See docs on reducing scope of this role assignment: https://azure.github.io/azure-service-operator/introduction/authentication/#using-a-credential-for-aso-with-reduced-permissions
+module assignContributorrRoleToASO 'role-assignments/subscription-contributor-role-assignment.bicep' = {
+  name: 'assignSubscriptionContributorRoleToASO'
+  params: {
+    principalId: asoManagedIdentity.outputs.managedIdentityPrincipalId
   }
 }
 
@@ -120,7 +142,6 @@ output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output AZURE_SUBSCRIPTION_ID string = subscription().subscriptionId
 output AZURE_AKS_CLUSTER_NAME string = aks.outputs.name
-output AZURE_AKS_CLUSTER_RESOURCE_GROUP string = resourceGroup.name
 output AZURE_AKS_CLUSTERIDENTITY_OBJECT_ID string = aks.outputs.clusterIdentity.objectId
 output AZURE_AKS_CLUSTERIDENTITY_CLIENT_ID string = aks.outputs.clusterIdentity.clientId
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = acr.outputs.loginServer
@@ -130,6 +151,7 @@ output AZURE_MANAGED_GRAFANA_ENDPOINT string = monitoring.outputs.grafanaDashboa
 output AZURE_MANAGED_PROMETHEUS_RESOURCE_ID string = monitoring.outputs.azureMonitorWorkspaceId
 output AZURE_MANAGED_GRAFANA_RESOURCE_ID string = monitoring.outputs.grafanaId
 output AZURE_MANAGED_GRAFANA_NAME string = monitoring.outputs.grafanaName
-output KEDA_WORKLOADIDENTITY_ID string = kedaManagedIdentity.outputs.managedIdentityClientId
+output KEDA_WORKLOADIDENTITY_ID string = kedaManagedIdentity.outputs.managedIdentityPrincipalId
+output ASO_WORKLOADIDENTITY_ID string = asoManagedIdentity.outputs.managedIdentityPrincipalId
 output PROMETHEUS_ENDPOINT string = monitoring.outputs.prometheusEndpoint
 

@@ -1,22 +1,22 @@
 param managedIdentityName string
 param federatedIdentityName string
-param serviceAccountNamespace string = 'kube-system'
-param serviceAccountName string = 'keda-operator'
+param serviceAccountNamespace string = 'azureserviceoperator-system'
+param serviceAccountName string = 'azureserviceoperator-default'
 param location string
 param aksOidcIssuer string
 
 @description('Custom tags to apply to the resources')
 param tags object = {}
 
-resource kedaManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource asoManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: managedIdentityName
   location: location
   tags: tags
 }
 
-resource kedaFederatedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2023-01-31' = {
+resource asoFederatedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2023-01-31' = {
   name: federatedIdentityName
-  parent: kedaManagedIdentity
+  parent: asoManagedIdentity
   properties: {
     audiences: [
       'api://AzureADTokenExchange'
@@ -26,4 +26,4 @@ resource kedaFederatedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities
   }
 }
 
-output managedIdentityPrincipalId string = kedaManagedIdentity.properties.principalId
+output managedIdentityPrincipalId string = asoManagedIdentity.properties.principalId
