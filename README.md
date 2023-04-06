@@ -115,7 +115,7 @@ Configure your azd pipeline
   (✓) Done: Setting AZURE_CLIENT_ID repo secret
 ```
 
-If you commit your changes, 
+If you commit your changes, you should see the pipeline running to build and deploy your application.
 
 ## Notable functionality
 
