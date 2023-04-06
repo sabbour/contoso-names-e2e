@@ -131,4 +131,5 @@ output AZURE_MANAGED_PROMETHEUS_RESOURCE_ID string = monitoring.outputs.azureMon
 output AZURE_MANAGED_GRAFANA_RESOURCE_ID string = monitoring.outputs.grafanaId
 output AZURE_MANAGED_GRAFANA_NAME string = monitoring.outputs.grafanaName
 output KEDA_WORKLOADIDENTITY_ID string = kedaManagedIdentity.outputs.managedIdentityClientId
+output PROMETHEUS_ENDPOINT string = monitoring.outputs.prometheusEndpoint
 

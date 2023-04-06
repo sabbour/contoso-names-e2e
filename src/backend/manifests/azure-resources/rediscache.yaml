@@ -1,7 +1,7 @@
 apiVersion: resources.azure.com/v1beta20200601
 kind: ResourceGroup
 metadata:
-  name: ${AZURE_AKS_CLUSTER_RESOURCE_GROUP}
+  name: contoso-names-aso-resources-rg
 spec:
   location: ${AZURE_LOCATION}
 ---
@@ -12,7 +12,7 @@ metadata:
 spec:
   location: ${AZURE_LOCATION}
   owner: 
-    name: ${AZURE_AKS_CLUSTER_RESOURCE_GROUP}
+    name: contoso-names-aso-resources-rg
   sku:
     family: C
     name: Basic
