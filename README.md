@@ -51,6 +51,12 @@ azd init -t https://github.com/sabbour/contoso-names-e2e
 
 ## Deploying infrastructure
 
+Run the pre-provisioning script to ensure your cluster has the required features registered.
+
+```
+./infra/azd-hooks/preprovision.sh
+```
+
 Deploy the infrastructure by running `azd provision`.
 
 ```
@@ -87,27 +93,26 @@ The output variables of the Bicep template will also be created as Kubernetes se
 
 > Note, it may take a few minutes for everything to be ready. After the Kubernetes manifests are deployed, the Azure Service Operator will start reconciling the resources to create a Resource Group and an Azure Cache for Redis. You may check the progress of the provisioning using `kubectl get redis -n contoso-names`.
 
+## Load testing
+
+Once the app is running, you can use a tool, like Azure Load Testing, to generate some load on the backend service and see the scaling in action.
+
+![Grafana dashboard](images/grafana.png)
+
 ## Continuous integration/continuous deployment
 
 There are two GitHub Actions pipelines in this repository, each corresponding to the application to be built and deployed.
 
 The workflows [frontend.yaml](./.github/workflows/frontend.yml) and [backend.yaml](./.github/workflows/backend.yml) use the Azure Developer CLI container image which has the CLI installed to login to the Azure environment with `azd login`, provision the infrastructure with `azd provision`, and deploy the application with `azd deploy <service name>`.
 
-To configure the GitHub repository with the secrets needed to run the pipeline, you'll need to run `azd pipeline config`.
+To configure the GitHub repository with the secrets needed to run the pipeline, you'll need to run `azd pipeline config`. 
+Since the infrastructure template requires setting up some role assignments, the created service principal will need to have `Owner` permissions on the resource group. 
 
 ```
-azd pipeline config
+azd pipeline config --principal-role Owner 
 ```
 
 Once you do so, and if you commit your changes, you should see the pipeline running to build and deploy your application.
-
-## Notable functionality
-
-### Kubernetes Event Driven Autoscaler (KEDA) with Prometheus scaler
-(todo)
-
-### Azure Cache for Redis provisioned using the Azure Service Operator
-(todo)
 
 ## Clean up
 
