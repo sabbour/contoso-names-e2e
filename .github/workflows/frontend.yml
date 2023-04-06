@@ -29,6 +29,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Helm tool installer
+        uses: Azure/setup-helm@v3
+
       - name: Log in with Azure (Federated Credentials)
         if: ${{ env.AZURE_CLIENT_ID != '' }}
         run: |
