@@ -3,10 +3,10 @@ name: contoso-names
 metadata:
     template: aks-app-base-template@0.0.1-beta
 hooks:
-    #preprovision:
-    #    run: infra/azd-hooks/preprovision.sh # commented out because this fails in the pipeline since it requires subscription scope access to registers any required features on the subscription
+    preprovision:
+        run: chmod +x infra/azd-hooks/preprovision.sh && infra/azd-hooks/preprovision.sh # Registers any required features on the subscription
     postprovision:
-        run: infra/azd-hooks/postprovision.sh # installs additional components on the cluster
+        run: chmod +x infra/azd-hooks/postprovision.sh && infra/azd-hooks/postprovision.sh # installs additional components on the cluster
 infra:
     provider: bicep
     path: infra
