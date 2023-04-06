@@ -23,14 +23,14 @@
             "type": "node"
         },
         {
-            "name": "Build and launch backend service (.NET Core)",
+            "name": "Build and launch backend (.NET Core)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-netcore",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/service/code/bin/Debug/net6.0/contoso-names-service.dll",
+            "program": "${workspaceFolder}/backend/code/bin/Debug/net7.0/contoso-names-service.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/service/code",
+            "cwd": "${workspaceFolder}/backend/code",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",

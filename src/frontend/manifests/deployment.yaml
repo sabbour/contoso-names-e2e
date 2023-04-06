@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contoso-names-frontend
+  labels:
+    app: contoso-names-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contoso-names-frontend
+  template:
+    metadata:
+      labels:
+        app: contoso-names-frontend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "80"
+    spec:
+      containers:
+      - name: contoso-names-frontend
+        image: ${SERVICE_FRONTEND_IMAGE_NAME}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 300m
+            memory: 300Mi
+          limits:
+            cpu: 300m
+            memory: 300Mi
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NAME_API_SERVICE_HOST
+          value: contoso-names-backend # the DNS name of the backend service
+        - name: NAME_API_SERVICE_PORT
+          value: "80"

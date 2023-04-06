@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>contoso_names_service</RootNamespace>
+    <UserSecretsId>61b0c1d7-78bd-4885-8908-707b8d3e116d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="prometheus-net" Version="7.0.0-pre-000305-75cc817" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="7.0.0-pre-000305-75cc817" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+     <PackageReference Include="StackExchange.Redis" Version="2.*" />
+  </ItemGroup>
+
+</Project>

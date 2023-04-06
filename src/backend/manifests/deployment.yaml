@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contoso-names-service
+  labels:
+    app: contoso-names-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contoso-names-service
+  template:
+    metadata:
+      labels:
+        app: contoso-names-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "80"
+    spec:
+      containers:
+      - name: contoso-names-service
+        image: ${SERVICE_BACKEND_IMAGE_NAME} # Will be replaced by CI/CD or the Azure Developer CLI
+        imagePullPolicy: Always
+        resources:
+            requests:
+              cpu: 300m
+              memory: 300Mi
+            limits:
+              cpu: 300m
+              memory: 300Mi
+        ports:
+        - containerPort: 80
+        env:
+        - name: REDIS_PRIMARY_KEY
+          valueFrom:
+              secretKeyRef:
+                name: redis-secret  # Will be populated by the Azure Service Operator
+                key: primaryKey
+                optional: false
+        - name: REDIS_HOSTNAME
+          valueFrom:
+              secretKeyRef:
+                name: redis-secret  # Will be populated by the Azure Service Operator
+                key: hostName
+                optional: false
+        - name: REDIS_PORT
+          valueFrom:
+              secretKeyRef:
+                name: redis-secret  # Will be populated by the Azure Service Operator
+                key: port
+                optional: false
