@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: contoso-names-service
+  name: contoso-names-backend
   labels:
-    app: contoso-names-service
+    app: contoso-names-backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: contoso-names-service
+      app: contoso-names-backend
   template:
     metadata:
       labels:
-        app: contoso-names-service
+        app: contoso-names-backend
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/scheme: "http"
@@ -20,7 +20,7 @@ spec:
         prometheus.io/port: "80"
     spec:
       containers:
-      - name: contoso-names-service
+      - name: contoso-names-backend
         image: ${SERVICE_BACKEND_IMAGE_NAME} # Will be replaced by CI/CD or the Azure Developer CLI
         imagePullPolicy: Always
         resources:

@@ -53,6 +53,10 @@ azd init -t https://github.com/sabbour/contoso-names-e2e
 
 Deploy the infrastructure by running `azd provision`.
 
+```
+azd provision
+```
+
 You will be prompted for the following information:
 
 - `Environment Name`: This will be used as a prefix for the resource group that will be created to hold all Azure resources. This name should be unique within your Azure subscription.
@@ -71,20 +75,55 @@ After a few minutes, you should see the resources deployed in your subscription.
 
 Running `azd deploy` will build the applications defined in [azure.yaml](./azure.yaml) by running a Docker build then the Azure Developer CLI will tag and push the images to the Azure Container Registry. Each deployment creates a new image tag that is used during the token replacement.
 
+```
+azd deploy
+```
+
 Azure Developer CLI will also apply the Kubernetes manifests in the path configured in [azure.yaml](./azure.yaml). The `name` specified in [azure.yaml](./azure.yaml) will correspond to the Kubernetes namespace that will be created on the cluster where all resources will be deployed to. 
 
 While applying the manifests, the Azure Developer CLI will also perform a token replacement for the placeholders defined in the Kubernetes manifests to insert the container image location, Prometheus endpoint, and more.
 
 The output variables of the Bicep template will also be created as Kubernetes secrets on the cluster.
 
+> Note, it may take a few minutes for everything to be ready. After the Kubernetes manifests are deployed, the Azure Service Operator will start reconciling the resources to create a Resource Group and an Azure Cache for Redis. You may check the progress of the provisioning using `kubectl get redis -n contoso-names`.
+
 ## Continuous integration/continuous deployment
+
+There are two GitHub Actions pipelines in this repository, each corresponding to the application to be built and deployed.
+
+The workflows [frontend.yaml](./.github/workflows/frontend.yml) and [backend.yaml](./.github/workflows/backend.yml) use the Azure Developer CLI container image which has the CLI installed to login to the Azure environment with `azd login`, provision the infrastructure with `azd provision`, and deploy the application with `azd deploy <service name>`.
+
+To configure the GitHub repository with the secrets needed to run the pipeline, you'll need to run `azd pipeline config`.
+
+```
+azd pipeline config
+```
+
+Once you do so, you should get a confirmation like this.
+
+```
+Configure your azd pipeline
+
+  (✓) Done: Checking current directory for Git repository
+  (✓) Done: Creating or updating service principal az-dev-<date>
+  (✓) Done: Federated identity credential for GitHub: subject repo:<repo name>:ref:refs/heads/main
+  (✓) Done: Federated identity credential for GitHub: subject repo:<repo name>:pull_request
+  (✓) Done: Setting AZURE_ENV_NAME repo secret
+  (✓) Done: Setting AZURE_LOCATION repo secret
+  (✓) Done: Setting AZURE_TENANT_ID repo secret
+  (✓) Done: Setting AZURE_SUBSCRIPTION_ID repo secret
+  (✓) Done: Setting AZURE_CLIENT_ID repo secret
+```
+
+If you commit your changes, 
 
 ## Notable functionality
 
 ### Kubernetes Event Driven Autoscaler (KEDA) with Prometheus scaler
-
+(todo)
 
 ### Azure Cache for Redis provisioned using the Azure Service Operator
+(todo)
 
 ## Clean up
 
