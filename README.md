@@ -95,7 +95,11 @@ The output variables of the Bicep template will also be created as Kubernetes se
 
 ## Load testing
 
-Once the app is running, you can use a tool, like Azure Load Testing, to generate some load on the backend service and see the scaling in action.
+Once the app is running, you can use a tool, like Azure Load Testing, to generate some load on the backend service and see the scaling in action. The dashboard has already been configured thile while deploying the infrastructure.
+
+You can view this by opening your Azure Managed Grafana dashboard.
+
+A KEDA scaler has been configured with a Prometheus trigger that queries the requests per second metric from the Azure Monitor managed Prometheus instance.
 
 ![Grafana dashboard](images/grafana.png)
 
