@@ -57,7 +57,7 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure login (for pre and post provision scripts)
+      - name: Azure login (for pre provision script)
         uses: azure/login@v1.4.3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -70,6 +70,13 @@ jobs:
           AZURE_ENV_NAME: ${{ secrets.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Azure login (for pre deploy scripts)
+        uses: azure/login@v1.4.3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Azure Dev Deploy
         run: azd deploy backend --no-prompt # deploy the backend only

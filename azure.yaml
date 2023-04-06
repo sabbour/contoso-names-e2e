@@ -7,10 +7,10 @@ hooks:
         interactive: true
         shell: sh
         run: chmod +x infra/azd-hooks/preprovision.sh && infra/azd-hooks/preprovision.sh # Registers any required features on the subscription
-    postprovision:
+    predeploy:
         interactive: true
         shell: sh
-        run: chmod +x infra/azd-hooks/postprovision.sh && infra/azd-hooks/postprovision.sh # installs additional components on the cluster
+        run: chmod +x infra/azd-hooks/predeploy.sh && infra/azd-hooks/predeploy.sh # installs additional components on the cluster
 infra:
     provider: bicep
     path: infra
