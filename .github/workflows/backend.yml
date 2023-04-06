@@ -31,6 +31,8 @@ jobs:
         
       - name: Helm tool installer
         uses: Azure/setup-helm@v3
+        with:
+           token: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Log in with Azure (Federated Credentials)
         if: ${{ env.AZURE_CLIENT_ID != '' }}
