@@ -99,23 +99,7 @@ To configure the GitHub repository with the secrets needed to run the pipeline, 
 azd pipeline config
 ```
 
-Once you do so, you should get a confirmation like this.
-
-```
-Configure your azd pipeline
-
-  (✓) Done: Checking current directory for Git repository
-  (✓) Done: Creating or updating service principal az-dev-<date>
-  (✓) Done: Federated identity credential for GitHub: subject repo:<repo name>:ref:refs/heads/main
-  (✓) Done: Federated identity credential for GitHub: subject repo:<repo name>:pull_request
-  (✓) Done: Setting AZURE_ENV_NAME repo secret
-  (✓) Done: Setting AZURE_LOCATION repo secret
-  (✓) Done: Setting AZURE_TENANT_ID repo secret
-  (✓) Done: Setting AZURE_SUBSCRIPTION_ID repo secret
-  (✓) Done: Setting AZURE_CLIENT_ID repo secret
-```
-
-If you commit your changes, you should see the pipeline running to build and deploy your application.
+Once you do so, and if you commit your changes, you should see the pipeline running to build and deploy your application.
 
 ## Notable functionality
 
