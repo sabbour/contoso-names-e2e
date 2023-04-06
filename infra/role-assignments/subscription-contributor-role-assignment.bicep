@@ -1,4 +1,5 @@
 param principalId string
+param desc string = ''
 targetScope = 'subscription'
 
 @description('This is the built-in Contributor role. See https://docs.microsoft.com/azure/role-based-access-control/built-in-roles#contributor')
@@ -12,5 +13,6 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-prev
     roleDefinitionId: contributorRoleDefinition.id
     principalId: principalId
     principalType: 'ServicePrincipal'
+    description: desc
   }
 }

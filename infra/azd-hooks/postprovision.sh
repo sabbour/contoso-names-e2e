@@ -24,7 +24,7 @@ helm upgrade --install --devel aso2 aso2/azure-service-operator \
      --namespace=azureserviceoperator-system \
      --set azureSubscriptionID=${AZURE_SUBSCRIPTION_ID} \
      --set azureTenantID=${AZURE_TENANT_ID} \
-     --set azureClientID=${ASO_WORKLOADIDENTITY_ID} \
+     --set azureClientID=${ASO_WORKLOADIDENTITY_CLIENT_ID} \
      --set useWorkloadIdentityAuth=true
 
 # Temporary until KEDA add-on is updated to 2.10 which is needed for workload identity support in Prometheus scaler

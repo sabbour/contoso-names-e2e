@@ -27,3 +27,4 @@ resource asoFederatedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities/
 }
 
 output managedIdentityPrincipalId string = asoManagedIdentity.properties.principalId
+output managedIdentityClientId string = asoManagedIdentity.properties.clientId

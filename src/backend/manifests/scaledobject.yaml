@@ -5,7 +5,7 @@ metadata:
 spec:
   podIdentity:
     provider: azure-workload
-    identityId: ${KEDA_WORKLOADIDENTITY_ID}
+    identityId: ${KEDA_WORKLOADIDENTITY_CLIENT_ID}
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject

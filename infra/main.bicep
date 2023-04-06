@@ -60,6 +60,7 @@ module containerRegistryAccess './role-assignments/aks-acr-role-assignment.bicep
   params: {
     aksPrincipalId: aks.outputs.clusterIdentity.objectId
     acrName: acr.outputs.name
+    desc: 'AKS cluster managed identity'
   }
 }
 
@@ -113,6 +114,7 @@ module assignAzureMonitorDataReaderRoleToKEDA 'role-assignments/azuremonitor-rol
   params: {
     principalId: kedaManagedIdentity.outputs.managedIdentityPrincipalId
     azureMonitorName: monitoring.outputs.azureMonitorWorkspaceName
+    desc: 'KEDA managed identity'
   }
 }
 
@@ -135,6 +137,7 @@ module assignContributorrRoleToASO 'role-assignments/subscription-contributor-ro
   name: 'assignSubscriptionContributorRoleToASO'
   params: {
     principalId: asoManagedIdentity.outputs.managedIdentityPrincipalId
+    desc: 'ASO managed identity'
   }
 }
 
@@ -151,7 +154,7 @@ output AZURE_MANAGED_GRAFANA_ENDPOINT string = monitoring.outputs.grafanaDashboa
 output AZURE_MANAGED_PROMETHEUS_RESOURCE_ID string = monitoring.outputs.azureMonitorWorkspaceId
 output AZURE_MANAGED_GRAFANA_RESOURCE_ID string = monitoring.outputs.grafanaId
 output AZURE_MANAGED_GRAFANA_NAME string = monitoring.outputs.grafanaName
-output KEDA_WORKLOADIDENTITY_ID string = kedaManagedIdentity.outputs.managedIdentityPrincipalId
-output ASO_WORKLOADIDENTITY_ID string = asoManagedIdentity.outputs.managedIdentityPrincipalId
+output KEDA_WORKLOADIDENTITY_CLIENT_ID string = kedaManagedIdentity.outputs.managedIdentityClientId
+output ASO_WORKLOADIDENTITY_CLIENT_ID string = asoManagedIdentity.outputs.managedIdentityClientId
 output PROMETHEUS_ENDPOINT string = monitoring.outputs.prometheusEndpoint
 
