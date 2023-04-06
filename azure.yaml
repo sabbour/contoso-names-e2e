@@ -3,8 +3,8 @@ name: contoso-names
 metadata:
     template: aks-app-base-template@0.0.1-beta
 hooks:
-    preprovision:
-        run: infra/azd-hooks/preprovision.sh # registers any required features on the subscription
+    #preprovision:
+    #    run: infra/azd-hooks/preprovision.sh # registers any required features on the subscription
     postprovision:
         run: infra/azd-hooks/postprovision.sh # installs additional components on the cluster
 infra:
