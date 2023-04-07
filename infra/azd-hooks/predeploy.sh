@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Pprinting the environment variables
+# Printing the environment variables
 printenv
 
 echo "Retrieving cluster credentials"
