@@ -95,13 +95,31 @@ The output variables of the Bicep template will also be created as Kubernetes se
 
 ## Load testing
 
-Once the app is running, you can use a tool, like Azure Load Testing, to generate some load on the backend service and see the scaling in action. The dashboard has already been configured thile while deploying the infrastructure.
+Once the app is running, you can use a tool, like Azure Load Testing, to generate some load on the backend service and see the scaling in action. The dashboard has already been configured thile while deploying the infrastructure. A KEDA scaler has been configured with a Prometheus trigger that queries the requests per second metric from the Azure Monitor managed Prometheus instance.
+
+![Azure Load Testing](images/loadtest.png)
+
+You'll need to grant your account `Azure Monitor Data Reader` and `Grafana Admin` roles. You will find the values of `AZURE_MANAGED_PROMETHEUS_RESOURCE_ID` and `AZURE_MANAGED_GRAFANA_RESOURCE_ID` in the `.azure/<environment name>/.env` file.
+
+```
+CURRENT_UPN=$(az account show --query user.name -o tsv)
+CURRENT_OBJECT_ID=$(az ad user show --id ${CURRENT_UPN} --query id -o tsv)
+
+# Azure Monitor Data Reader role assignment for current user
+az role assignment create --assignee "${CURRENT_OBJECT_ID}" \
+  --role "b0d8363b-8ddd-447d-831f-62ca05bff136" \
+  --scope "${AZURE_MANAGED_PROMETHEUS_RESOURCE_ID}"
+
+# Grafana Admin role assignment for current user
+az role assignment create --assignee "${CURRENT_OBJECT_ID}" \
+  --role "22926164-76b3-42b3-bc55-97df8dab3e41" \
+  --scope "${AZURE_MANAGED_GRAFANA_RESOURCE_ID}"
+```
 
 You can view this by opening your Azure Managed Grafana dashboard.
 
-A KEDA scaler has been configured with a Prometheus trigger that queries the requests per second metric from the Azure Monitor managed Prometheus instance.
-
 ![Grafana dashboard](images/grafana.png)
+
 
 ## Continuous integration/continuous deployment
 
