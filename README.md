@@ -30,10 +30,10 @@ The following infrastructure resources defined as Bicep templates in the `infra`
 The template uses the following [event hooks](https://learn.microsoft.com/azure/developer/azure-developer-cli/azd-extensibility) to customize the workflow:
 
 - [preprovision](./infra/azd-hooks/preprovision.sh) to make sure that all the required AKS features are registered.
-- [postprovision](./infra/azd-hooks/postprovision.sh) to perform additional configuration that's not possible with Bicep including:
+- [predeploy](./infra/azd-hooks/predeploy.sh) to perform additional configuration that's not possible with Bicep including:
   - Installing the [Azure Service Operator](https://azure.github.io/azure-service-operator/) Helm chart.
   - Installing the [Kubernetes Event Driven Autoscaler (KEDA)](https://keda.sh) Helm chart.
-  - Deploying a Grafana dashboard and assigning `Azure Monitor Data Reader` and `Grafana Admin` roles to the current user.
+  - Deploying a Grafana dashboard.
 
 ### Frontend and backend code and Kubernetes manifests
 
@@ -93,7 +93,7 @@ The output variables of the Bicep template will also be created as Kubernetes se
 
 > Note, it may take a few minutes for everything to be ready. After the Kubernetes manifests are deployed, the Azure Service Operator will start reconciling the resources to create a Resource Group and an Azure Cache for Redis. You may check the progress of the provisioning using `kubectl get redis -n contoso-names`.
 
-## Load testing
+## Load testing and monitoring
 
 Once the app is running, you can use a tool, like Azure Load Testing, to generate some load on the backend service and see the scaling in action. The dashboard has already been configured thile while deploying the infrastructure. A KEDA scaler has been configured with a Prometheus trigger that queries the requests per second metric from the Azure Monitor managed Prometheus instance.
 
@@ -114,6 +114,12 @@ az role assignment create --assignee "${CURRENT_OBJECT_ID}" \
 az role assignment create --assignee "${CURRENT_OBJECT_ID}" \
   --role "22926164-76b3-42b3-bc55-97df8dab3e41" \
   --scope "${AZURE_MANAGED_GRAFANA_RESOURCE_ID}"
+```
+
+Create the Grafana dashboard. You will find the values of `AZURE_RESOURCE_GROUP` and `AZURE_MANAGED_GRAFANA_NAME` in the `.azure/<environment name>/.env` file.
+
+```
+az grafana dashboard create -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_MANAGED_GRAFANA_NAME}  --title "RPSDashboard" --folder managed-prometheus --definition https://raw.githubusercontent.com/sabbour/contoso-names-e2e/main/infra/monitoring/grafana-dashboard.json
 ```
 
 You can view this by opening your Azure Managed Grafana dashboard.
