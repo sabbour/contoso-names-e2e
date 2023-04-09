@@ -1,7 +1,7 @@
 apiVersion: resources.azure.com/v1beta20200601
 kind: ResourceGroup
 metadata:
-  name: contoso-names-aso-rg
+  name: ${AZURE_RESOURCE_GROUP}-aso
 spec:
   location: ${AZURE_LOCATION}
 ---
@@ -15,7 +15,7 @@ spec:
   sku:
     name: Standard_LRS
   owner:
-    name: contoso-names-aso-rg
+    name: ${AZURE_RESOURCE_GROUP}-aso
   accessTier: Hot
   # Save the keys for the storage account into a Kubernetes secret
   operatorSpec:
