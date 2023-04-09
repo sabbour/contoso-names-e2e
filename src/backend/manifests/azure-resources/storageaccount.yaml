@@ -8,7 +8,7 @@ spec:
 apiVersion: storage.azure.com/v1beta20210401
 kind: StorageAccount
 metadata:
-  name: contoso:storage
+  name: contosonamesstorage
 spec:
   location: ${AZURE_LOCATION}
   kind: StorageV2
