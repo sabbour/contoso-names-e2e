@@ -15,7 +15,7 @@ var aksDiagCategories = [
   'kube-audit-admin'
   'guard'
 ]
-
+/*
 resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: 'aks-diagnostics'
   scope: aks
@@ -33,6 +33,7 @@ resource diagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' 
     ]
   }
 }
+*/
 
 resource aks 'Microsoft.ContainerService/managedClusters@2023-02-02-preview' = {
   location: location
