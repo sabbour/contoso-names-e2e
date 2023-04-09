@@ -33,21 +33,15 @@ spec:
         ports:
         - containerPort: 80
         env:
-        - name: REDIS_PRIMARY_KEY
+        - name: STORAGE_ACCOUNT_BLOB_ENDPOINT
           valueFrom:
               secretKeyRef:
-                name: redis-secret  # Will be populated by the Azure Service Operator
-                key: primaryKey
+                name: storageaccount-secret  # Will be populated by the Azure Service Operator
+                key: blobEndpoint
                 optional: false
-        - name: REDIS_HOSTNAME
+        - name: STORAGE_ACCOUNT_KEY
           valueFrom:
               secretKeyRef:
-                name: redis-secret  # Will be populated by the Azure Service Operator
-                key: hostName
-                optional: false
-        - name: REDIS_PORT
-          valueFrom:
-              secretKeyRef:
-                name: redis-secret  # Will be populated by the Azure Service Operator
-                key: port
+                name: storageaccount-secret  # Will be populated by the Azure Service Operator
+                key: key1
                 optional: false
