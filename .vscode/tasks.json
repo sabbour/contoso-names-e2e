@@ -15,7 +15,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/service/code/contoso-names-service.csproj",
+                "${workspaceFolder}/src/backend/code/contoso-names-service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -27,7 +27,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/service/code/contoso-names-service.csproj",
+                "${workspaceFolder}/src/backend/code/contoso-names-service.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -41,7 +41,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/service/code/contoso-names-service.csproj"
+                "${workspaceFolder}/src/backend/code/contoso-names-service.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

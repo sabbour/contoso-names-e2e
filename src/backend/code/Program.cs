@@ -2,28 +2,40 @@ using System.Xml.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Prometheus;
-using StackExchange.Redis;
+using Azure;
+using Azure.Data.Tables;
 
 namespace ContosoService
 {
 
-    public class Name
+    public class Name: ITableEntity
     {
+        public string RowKey { get; set; } = default!;
+
+        public string PartitionKey { get; set; } = default!;
+
         public string id { get; set; }
         public string name { get; set; }
+
+        public ETag ETag { get; set; } = default!;
+
+        public DateTimeOffset? Timestamp { get; set; } = default!;
+
+        public Name() { }
 
         public Name(string id, string name)
         {
             this.id = id;
             this.name = name;
+            this.RowKey = id;
         }
     }
 
     class Program
     {
         // Redis connection
-        private static RedisConnection _redisConnection;
-        private static bool useRedis = false;
+        private static TableServiceClient _tableServiceClient;
+        private static bool useAzureStorage = false;
 
         static async Task Main(string[] args)
         {
@@ -43,17 +55,20 @@ namespace ContosoService
             try
             {
                 // Read the connection string from an environment variable.
-                var redisPrimarhKey = Environment.GetEnvironmentVariable("REDIS_PRIMARY_KEY");
-                var redisHostName = Environment.GetEnvironmentVariable("REDIS_HOSTNAME");
-                var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT");
-                var redisConnectionString = $"{redisHostName}:{redisPort},password={redisPrimarhKey},ssl=True,abortConnect=False";
-               _redisConnection = await RedisConnection.InitializeAsync(redisConnectionString);
-                useRedis = true;
+                var storageAccountKey = Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_KEY");
+                var blobEndpoint = Environment.GetEnvironmentVariable("STORAGE_ACCOUNT_BLOB_ENDPOINT");
+                if(blobEndpoint!=null) {
+                    var blobEndpointUri = new Uri(blobEndpoint);
+                    string storageAccountName = blobEndpointUri.Host.Split('.')[0];
+                    string storageConnectionString = $"DefaultEndpointsProtocol=https;AccountName={storageAccountName};AccountKey={storageAccountKey};EndpointSuffix=core.windows.net";
+                    _tableServiceClient = new TableServiceClient(storageConnectionString);
+                    useAzureStorage = true;
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Redis connection failed. Skipping caching: " + ex.Message);
-                useRedis = false;
+                Console.WriteLine("Azure Table storage connection failed. Skipping caching: " + ex.Message);
+                useAzureStorage = false;
             }
 
             // Configure the HTTP request pipeline.
@@ -85,26 +100,28 @@ namespace ContosoService
                 Name result = null;
 
                 // Try to get the results from cache
-                if (useRedis)
+                if (useAzureStorage)
                 {
-                    Console.WriteLine($"Trying to find key {adjectiveId}-{nounId} in Redis");
-                    result = await GetFromRedis(adjectiveId, nounId);
+                    Console.WriteLine($"Trying to find key {adjectiveId}-{nounId} in Azure Table Storage");
+                    result = await GetFromAzureTableStorage(adjectiveId, nounId);
                     if (result != null)
-                        Console.WriteLine($"CACHE HIT: {adjectiveId}-{nounId} in Redis with value {result.name}");
+                        Console.WriteLine($"CACHE HIT: {adjectiveId}-{nounId} in Azure Table Storage with value {result.name}");
                 }
                 // If we couldn't, or we're not using redis, generate the result
-                if(result == null || useRedis == false)
+                if(result == null || useAzureStorage == false)
                 {
                     Console.WriteLine($"CACHE MISS: {adjectiveId}-{nounId}, generating new result");
                     var adjective = adjectives[adjectiveId];
                     var noun = nouns[Random.Shared.Next(nounId)];
                     result = new Name($"{adjectiveId}-{nounId}", $"{adjective} {noun}".ToLower());
+                    result.RowKey = result.id;
+                    result.PartitionKey = "demo";
 
-                    // If Redis is used, seralize the result to JSON and store it in Redis
-                    if (useRedis)
+                    // If Azure Table Storage is used, seralize the result to JSON and store it in Azure Table Storage
+                    if (useAzureStorage)
                     {
                         Console.WriteLine($"Storing result {result.name} in Redis key {adjectiveId}-{nounId}");
-                        await StoreInRedis(adjectiveId, nounId, result);
+                        await StoreInAzureTableStorage(result);
                     }
                 }
 
@@ -115,36 +132,45 @@ namespace ContosoService
             app.Run();
         }
 
-        // Store the result in Redis
-        private static async Task StoreInRedis(int adjectiveId, int nounId, Name result)
+        // Store the result in Azure Table Storage
+        private static async Task StoreInAzureTableStorage(Name result)
         {
             try
             {
-                await _redisConnection.BasicRetryAsync(async (db) => await db.StringSetAsync($"{adjectiveId}-{nounId}", JsonSerializer.Serialize(result)));
+                TableClient tableClient = _tableServiceClient.GetTableClient(tableName: "names");
+                await tableClient.CreateIfNotExistsAsync();
+                await tableClient.AddEntityAsync<Name>(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Redis connection failed. Skipping caching: " + ex.Message);
+                Console.WriteLine("Azure Table storage connection failed. Skipping caching: " + ex.Message);
             }
         }
 
-        // Get the result from Redis
-        private static async Task<Name> GetFromRedis(int adjectiveId, int nounId)
+        // Get the result from Azure Table Storage
+        private static async Task<Name> GetFromAzureTableStorage(int adjectiveId, int nounId)
         {
             try
             {
-                var resultString = await _redisConnection.BasicRetryAsync(async (db) => await db.StringGetAsync($"{adjectiveId}-{nounId}"));
-                if(string.IsNullOrEmpty(resultString))
-                {
+                TableClient tableClient = _tableServiceClient.GetTableClient(tableName: "names");
+                await tableClient.CreateIfNotExistsAsync();
+
+                var PartitionKey = "demo";
+                var RowKey = $"{adjectiveId}-{nounId}";
+
+                // Find the entity in Azure Table Storage
+                var queryResults = tableClient.Query<Name>(
+                    filter: e => e.PartitionKey == PartitionKey && e.RowKey == RowKey
+                );
+
+                if(queryResults.Count() > 0)
+                    return queryResults.First();
+                else
                     return null;
-                }
-                else {
-                    return JsonSerializer.Deserialize<Name>(resultString.ToString());
-                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Redis connection failed. Skipping caching: " + ex.Message);
+                Console.WriteLine("Azure Table storage connection failed. Skipping caching: " + ex.Message);
                 return null;
             }
         }
