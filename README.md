@@ -116,10 +116,15 @@ az role assignment create --assignee "${CURRENT_OBJECT_ID}" \
   --scope "${AZURE_MANAGED_GRAFANA_RESOURCE_ID}"
 ```
 
-Create the Grafana dashboard. You will find the values of `AZURE_RESOURCE_GROUP` and `AZURE_MANAGED_GRAFANA_NAME` in the `.azure/<environment name>/.env` file.
+Update the Grafana dashboard file (`infra/monitoring/grafana-dashboard.json`) with your Azure Monitor instance name defined as `AZURE_MANAGED_PROMETHEUS_NAME` in the `.azure/<environment name>/.env` file.
+```
+sed "s/_AZURE_MANAGED_PROMETHEUS_NAME_/${AZURE_MANAGED_PROMETHEUS_NAME}/g" ./infra/monitoring/grafana-dashboard.json > ./infra/monitoring/grafana-dashboard-updated.json
+```
+
+Create the Grafana dashboard from the output file `infra/monitoring/grafana-dashboard-updated.json`. You will find the values of `AZURE_RESOURCE_GROUP` and `AZURE_MANAGED_GRAFANA_NAME` in the `.azure/<environment name>/.env` file.
 
 ```
-az grafana dashboard create -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_MANAGED_GRAFANA_NAME}  --title "RPSDashboard" --folder managed-prometheus --definition https://raw.githubusercontent.com/sabbour/contoso-names-e2e/main/infra/monitoring/grafana-dashboard.json
+az grafana dashboard create -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_MANAGED_GRAFANA_NAME}  --title "RPSDashboard" --folder managed-prometheus --definition ./infra/monitoring/grafana-dashboard-updated.json
 ```
 
 You can view this by opening your Azure Managed Grafana dashboard.
