@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: as
+  labels:
+    app: as
+  namespace: namespace-workflow-1692743510796
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: as
+  template:
+    metadata:
+      labels:
+        app: as
+    spec:
+      containers:
+        - name: as
+          image: aksappenvacrvea.azurecr.io/image-workflow-1692743510796:latest
+          ports:
+            - containerPort: 3000
